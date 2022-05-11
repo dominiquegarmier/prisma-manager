@@ -1,7 +1,9 @@
-import subprocess
-from pathlib import Path
+from __future__ import annotations
 
-from argparse import ArgumentParser, Namespace
+import subprocess
+from argparse import ArgumentParser
+from argparse import Namespace
+from pathlib import Path
 
 
 __all__ = [
@@ -14,8 +16,8 @@ def build(args: Namespace) -> None:
     base_path = Path(__file__).parent
     with (
         open(base_path / './prisma/schema.prisma', 'w') as dest,
-        open(base_path / './prisma/models.prisma', 'r') as models,
-        open(base_path / f'./prisma/{args.language}.prisma', 'r') as client,
+        open(base_path / './prisma/models.prisma') as models,
+        open(base_path / f'./prisma/{args.language}.prisma') as client,
     ):
         # remove first line that contains generator for linting
         models_strs = models.readlines()[4:]
