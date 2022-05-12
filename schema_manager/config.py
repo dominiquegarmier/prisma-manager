@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from argparse import Namespace
 from functools import cache
+from pprint import pprint
 from typing import TypedDict
 
 import yaml
+
+from schema_manager.exceptions import ConfigNotFound
+from schema_manager.exceptions import InvalidConfig
 
 
 class PackageMetadata(TypedDict):
@@ -29,15 +34,15 @@ class Config(TypedDict):
     schema_metadata: SchemaMetadata
 
 
-class InvalidConfig(Exception):
-    pass
-
-
 @cache
-def load_config(config_path: str | None = None) -> Config | None:
+def load_config(args: Namespace, config_path: str | None = None) -> Config:
     try:
-        with open(config_path or '.prisma-schema-manager.yaml') as f:
-            parsed_config = yaml.safe_load(f)['config']
+        config_path = config_path or '.prisma-schema-manager.yaml'
+        try:
+            with open(config_path) as f:
+                parsed_config = yaml.safe_load(f)['config']
+        except FileNotFoundError:
+            raise ConfigNotFound(f'config file {config_path} not found')
 
         package = parsed_config['package']
         package_metadata: PackageMetadata = {
@@ -60,10 +65,13 @@ def load_config(config_path: str | None = None) -> Config | None:
                 'path': client['path'],
             }
             clients.append(client_md)
-
-        return {
+        ret: Config = {
             'package_metadata': package_metadata,
             'schema_metadata': schema_metadata,
         }
+
+        if args.debug:
+            pprint(ret)
+        return ret
     except (KeyError, IndexError):
-        raise InvalidConfig()
+        raise InvalidConfig(f'config file {config_path} is invalid')

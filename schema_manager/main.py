@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser
+from argparse import Namespace
+from typing import Callable
+from typing import cast
 
+from config import Config
 from config import get_config
-from config import InvalidConfig
 
 from schema_manager.commands.codegen import codegen
 from schema_manager.commands.init_project import init
 from schema_manager.commands.switch import switch
+from schema_manager.exceptions import ConfigNotFound
+from schema_manager.exceptions import InvalidConfig
 
 
 def main() -> int:
@@ -30,6 +35,10 @@ def main() -> int:
     switch_parser.set_defaults(func=switch)
 
     parser.add_argument(
+        '--debug', help='enable debug mode', action='store_true', dest='debug'
+    )
+
+    parser.add_argument(
         '--config',
         dest='config_path',
         type=str,
@@ -38,17 +47,18 @@ def main() -> int:
     )
 
     args = parser.parse_args()
+    args.func = cast(Callable[..., int], args.func)
 
-    if args.func is not init:
-        try:
-            config = get_config(args.config_path)
-        except InvalidConfig:
-            print('invalid config file')
-        args.func(args=args, config=config)
-    else:
-        args.func(args=args)
+    try:
+        config = get_config(args, args.config_path)
+    except InvalidConfig:
+        print('invalid config')
+    except ConfigNotFound:
+        if args.func is init:
+            return cast(Callable[[Namespace], int], args.func)(args)
+        print('config not found')
 
-    return 0
+    return cast(Callable[[Config, Namespace], int], args.func)(config, args)
 
 
 if __name__ == '__main__':

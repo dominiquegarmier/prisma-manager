@@ -21,5 +21,5 @@ def build(args: Namespace) -> None:
     return
 
 
-def switch(config: Config, argparse: Namespace) -> int:
+def switch(config: Config, args: Namespace) -> int:
     return 0
