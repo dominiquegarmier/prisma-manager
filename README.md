@@ -1,6 +1,5 @@
-# prisma schema manage
-do you have multiple enviroments that depend on the same prisma schema? perhaps even across multiple languages?
-you can now use prisma schema manager to keep your schema in a central place and keep your dependant repositories up to date
+# prisma-manager
+This is a template repository to manage prisma schemas for multiple clients. It makes your schemas installable with `pip`. When installing a prisma-manager repo you will also get access to a cli to switch between clients and run codgen.
 
 ## about
 
@@ -8,74 +7,52 @@ this tool was originally developed as an interal tool at [tostudyio](https://git
 
 ## usage
 
-Fork this repo, and write your own schema in the `database/prisma/models.schema`.
-Now you can simply install your forked repo using pip and codegen your client in no time.
+Create a repo using this template and customize the schemas located at `database/prisma/`.
 
-### install (npm)
-coming soon ...
+- create `schema.prisma` like you would in any prisma project
+- create `*client*.prisma` for any client you would like to support, this file should only contain the generator block.
 
-### install (pip)
+If you are confused take a look at the default files [`database/prisma/`](./database/prisma/).
 
+If you are using other clients the `prisma-client-py` you should add those additional dependencies to `setup.py` or `setup.cfg` or install them manually.
+
+### install
+if you used `prisma-manager` as your repo template you should be able to install it directly with pip
 ```
-pip install git+ssh://git@github.com/username/repo
+pip install git+ssh://git@github.com/username/your-templated-repo
 ```
-
-### usage
+you can also just try it out directly by installing the template
 ```
-db-cli -h
-usage: db-cli [-h] {build,codegen} ...
-
-build schema for desired client
-
-positional arguments:
-  {build,codegen}
-    build          build schema
-    codegen        codegen schema
-
-options:
-  -h, --help       show this help message and exit
+pip install git+ssh://git@github.com/dominiquegarmier/prisma-manager
 ```
 
-#### build
-```
-db-cli build *language*
-```
+if there is intrest there might come support for other packaging tools such as `npm`, `go-get`, `cargo`
+
+### cli
+Once you have installed your templated repo you will have access the the `prisma-manager` cli.
 
 #### codegen
+generate the specified client
 ```
-db-cli codegen
+prisma-manager codgen *client*
+```
+with python:
+```
+prisma-manager codgen python
+```
+you can now import the client in python
+```python
+from prisma import Prisma
 ```
 
-### development
+## FAQ
 
-#### build
-```
-cd database
-python cli.py build *language*
-```
+#### why not make a meta package
+By meta package I mean primarily a tool (like [`pre-commit`](https://github.com/pre-commit/pre-commit)) which allows you to create packages.
 
-#### migrate changes
-when your schema changes you will have to migrate it to the database using the following commands.
+A:
+This would probably be the best way to go about this whole thing. However it's alot of added complexity which I dont see as necessary right now. As the project grows more complex this might become necessary.
 
-##### using prisma migrate
-use this in production to not lose any information
-
-##### force push (development only)
-
-***WARNING*** this will drop everything
-```
-cd database
-npx prisma migrate reset
-npx prisma db push
-```
 
 ## license
 [MIT](./LICENSE)
-
-
-## planned features
-support other prisma clients such as `prisma-client-rust`, `prisma-client-go`, with that would come support for other package managers such as `npm`, `yarn`, `cargo`, `go get`
-
-## currently supported
-- `prisma-client-py`
-- `prisma-client-js`

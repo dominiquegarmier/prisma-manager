@@ -4,7 +4,7 @@ import subprocess
 from argparse import Namespace
 from pathlib import Path
 
-from database.utils import get_schema
+from prisma_manager.utils import get_schema
 
 
 def _codegen(path: Path) -> None:

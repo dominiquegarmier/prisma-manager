@@ -5,7 +5,7 @@ from argparse import Namespace
 from typing import Callable
 from typing import cast
 
-from database.codegen import codegen
+from prisma_manager.codegen import codegen
 
 
 def main() -> int:
