@@ -1,2 +1,1 @@
 pre-commit
-prisma  # add this so that github deps graph gives propper credit
