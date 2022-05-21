@@ -5,24 +5,17 @@ from argparse import Namespace
 from typing import Callable
 from typing import cast
 
-from config import Config
-
-from database.commands.codegen import codegen
-from database.commands.switch import switch
+from database.codegen import codegen
 
 
 def main() -> int:
 
     parser = ArgumentParser('prisma schema manager')
-    subparsers = parser.add_subparsers(title='commands')
+    subparsers = parser.add_subparsers(title='commands', required=True)
 
     condgen_parser = subparsers.add_parser('codegen', help='generate prisma client')
     condgen_parser.add_argument('client', help='client to generate', type=str)
     condgen_parser.set_defaults(func=codegen)
-
-    switch_parser = subparsers.add_parser('switch', help='switch client')
-    switch_parser.add_argument('client', help='client to generate', type=str)
-    switch_parser.set_defaults(func=switch)
 
     parser.add_argument(
         '--debug', help='enable debug mode', action='store_true', dest='debug'
